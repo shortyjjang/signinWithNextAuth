@@ -1,26 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { signIn } from "next-auth/react";
-import { signInWithCredentials } from "@/auth/serverActions";
 
 export default function SignInPage() {
-  const handleSubmit = async (formData: FormData) => {
-    const email = formData.get("email")?.toString().trim();
-    const password = formData.get("password")?.toString().trim();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!email || !password) {
       return;
     }
-    formData.set("email", email);
-    formData.set("password", password);
-    const res = await signInWithCredentials({ message: "" }, formData);
+    const res = await signIn("credentials", { email: email.trim(), password: password.trim() });
     console.log(res);
   };
   return (
     <div className="flex flex-col items-center justify-center h-screen">
-      <form action={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <fieldset>
           <legend>로그인</legend>
-          <input type="text" placeholder="이메일" />
-          <input type="password" placeholder="비밀번호" />
+          <input type="text" placeholder="이메일" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input type="password" placeholder="비밀번호" value={password} onChange={(e) => setPassword(e.target.value)} />
           <button type="submit">로그인</button>
           <button onClick={() => signIn("kakao")}>카카오로 로그인</button>
           <button onClick={() => signIn("google")}>구글로 로그인</button>

@@ -1,10 +1,10 @@
 "use client";
-import { signOutUser } from "@/auth/serverActions";
-import React, { useEffect } from "react";
+import { signOut } from "next-auth/react";
+import { useEffect } from "react";
 
 export default function SignOutPage() {
   useEffect(() => {
-    signOutUser();
+    signOut();
   }, []);
   return null;
 }

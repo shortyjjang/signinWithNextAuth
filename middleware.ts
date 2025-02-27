@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { match } from 'path-to-regexp'
-import { getSession } from 'next-auth/react'
+import { getToken } from 'next-auth/jwt'
 
 // 인증이 필요한 페이지
 const matchersForAuth = [
@@ -12,16 +12,17 @@ const matchersForSignIn = [
   '/auth/signin/*'
 ]
 export async function middleware(request: NextRequest) {
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   // 인증이 필요한 페이지 접근 제어!
   if (isMatch(request.nextUrl.pathname, matchersForAuth)) {
-    return (await getSession()) // 세션 정보 확인
+    return token // 세션 정보 확인
       ? NextResponse.next()
       : NextResponse.redirect(new URL('/signin', request.url))
       // : NextResponse.redirect(new URL(`/signin?callbackUrl=${request.url}`, request.url))
   }
   // 인증 후 회원가입 및 로그인 접근 제어!
   if (isMatch(request.nextUrl.pathname, matchersForSignIn)) {
-    return (await getSession())
+    return token
       ? NextResponse.redirect(new URL('/', request.url))
       : NextResponse.next()
   }
